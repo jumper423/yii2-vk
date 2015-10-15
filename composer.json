@@ -1,0 +1,25 @@
+{
+  "name": "jumper423/yii2-vk",
+  "description": "",
+  "keywords": ["yii2", "vk", "api", "вконтакте", "апи", "vkontakte"],
+  "homepage": "",
+  "type": "project",
+  "license": "Apache License 2.0",
+  "support": {
+    "issues": "https://github.com/jumper423/yii2-vk/issues?state=open",
+    "source": "https://github.com/jumper423/yii2-vk"
+  },
+  "minimum-stability": "stable",
+  "require": {
+    "php": ">=5.4.0",
+    "yiisoft/yii2": "*",
+    "yiisoft/yii2-authclient": "~2.0",
+    "jumper423/yii2-captcha": "*"
+  },
+  "config": {
+    "process-timeout": 1800
+  },
+  "autoload": {
+    "psr-4": {"jumper423\\": ""}
+  }
+}
