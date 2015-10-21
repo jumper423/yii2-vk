@@ -32,10 +32,9 @@ class VK extends VKontakte
     {
         parent::__construct($config);
         if (is_string($this->captcha)) {
-            if (Yii::$app->has($this->captcha, true)) {
+            if (Yii::$app->has($this->captcha)) {
                 $this->captcha = Yii::$app->get($this->captcha);
             } else {
-                throw new Exception('Not Component');
                 $this->captcha = null;
             }
         } elseif (is_object($this->captcha)) {
