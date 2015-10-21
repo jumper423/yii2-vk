@@ -35,6 +35,7 @@ class VK extends VKontakte
             if (Yii::$app->has($this->captcha, true)) {
                 $this->captcha = Yii::$app->get($this->captcha);
             } else {
+                throw new Exception('Not Component');
                 $this->captcha = null;
             }
         } elseif (is_object($this->captcha)) {
