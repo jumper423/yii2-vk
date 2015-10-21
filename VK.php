@@ -179,7 +179,7 @@ class VK extends VKontakte
     /**
      * @param $imagePath
      * @param $albumId
-     * @param null $groupId
+     * @param null|int $groupId
      * @return int
      * @throws Exception
      */
