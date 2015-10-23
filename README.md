@@ -99,7 +99,7 @@ $vk = Yii::$app->vk;
 
 или
 
-$vk = Yii::$app->authClientCollection->client('vkontakte');
+$vk = Yii::$app->authClientCollection->getClient('vkontakte');
 ```
 
 Создание альбома
