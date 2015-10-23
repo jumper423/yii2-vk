@@ -56,7 +56,7 @@ php composer.phar require --prefer-dist jumper423/yii2-vk "*"
     'captcha' => [
         'class' => 'jumper423\Captcha',
         'pathTmp' => '@imagescache/captcha',
-        'apiKey' => '42eab4119020dbc729f657fef270f521',
+        'apiKey' => '42eab4119020dbc729f657',
     ],
     'authClientCollection' => [
         'class' => 'yii\authclient\Collection',
