@@ -12,7 +12,7 @@ class VK extends VKontakte
 {
     public $delay = 0.7;
     public $delayExecute = 120;
-    public $executeLimit = 1;
+    public $limitExecute = 1;
     /**
      * @var null|string|Captcha
      */
@@ -168,8 +168,8 @@ class VK extends VKontakte
     {
         $executeCount = count($this->execute);
         $response = [];
-        for ($i = 0; $executeCount > $i; $i += $this->executeLimit) {
-            $response = ArrayHelper::merge($response, $this->post('execute', ['code' => "return \n [" . implode(",\n", array_slice($this->execute, $i, $this->executeLimit)) . "];"]));
+        for ($i = 0; $executeCount > $i; $i += $this->limitExecute) {
+            $response = ArrayHelper::merge($response, $this->post('execute', ['code' => "return \n [" . implode(",\n", array_slice($this->execute, $i, $this->limitExecute)) . "];"]));
             sleep($this->delayExecute);
         }
         $this->execute = [];
