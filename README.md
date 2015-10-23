@@ -52,36 +52,32 @@ php composer.phar require --prefer-dist jumper423/yii2-vk "*"
 "Расшиненая" конфигурация
 
 ```php
-$config = [
-    'components' => [
-        'captcha' => [
-            'class' => 'jumper423\Captcha',
-            'pathTmp' => '@imagescache/captcha',
-            'apiKey' => '42eab4119020dbc729f657fef270f521',
-        ],
-        'authClientCollection' => [
-            'class' => 'yii\authclient\Collection',
-            'clients' => [
-                'vkontakte' => [
-                    'class' => 'jumper423\VK',
-                    'clientId' => '11111',
-                    'clientSecret' => 'n9wsv98svSD867SA7dsda87',
-                    'delay' => 0.7,
-                    'delayExecute' => 120,
-                    'limitExecute' => 1,
-                    'captcha' => 'captcha',
-                    'scope' => 'friends,photos,pages,wall,groups,email,stats,ads,offline,notifications', //,messages,nohttps
-                    'title' => 'ВКонтакте'
-                ],
+'components' => [
+    'captcha' => [
+        'class' => 'jumper423\Captcha',
+        'pathTmp' => '@imagescache/captcha',
+        'apiKey' => '42eab4119020dbc729f657fef270f521',
+    ],
+    'authClientCollection' => [
+        'class' => 'yii\authclient\Collection',
+        'clients' => [
+            'vkontakte' => [
+                'class' => 'jumper423\VK',
+                'clientId' => '11111',
+                'clientSecret' => 'n9wsv98svSD867SA7dsda87',
+                'delay' => 0.7,
+                'delayExecute' => 120,
+                'limitExecute' => 1,
+                'captcha' => 'captcha',
+                'scope' => 'friends,photos,pages,wall,groups,email,stats,ads,offline,notifications', //,messages,nohttps
+                'title' => 'ВКонтакте'
             ],
         ],
     ],
-    'aliases' => [
-        '@actions' => '@backend/runtime/cron', // Папка куда будут складироваться очереди для cron-а
-    ],
-];
-
-return $config;
+],
+'aliases' => [
+    '@actions' => '@backend/runtime/cron', // Папка куда будут складироваться очереди для cron-а
+],
 ```
 
 
