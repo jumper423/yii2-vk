@@ -11,7 +11,7 @@ use yii\helpers\Json;
 class VK extends VKontakte
 {
     public $delay = 0.7;
-    public $delayExecute = 120;
+    public $delayExecute2 = 120;
     public $limitExecute = 1;
     /**
      * @var null|string|Captcha
@@ -153,7 +153,7 @@ class VK extends VKontakte
                     unset($execute[$r]);
                     file_put_contents(Yii::getAlias("@actions/{$method}.json"), Json::encode($execute));
                 }
-                sleep($this->delayExecute);
+                sleep($this->delayExecute2);
             } else {
                 break;
             }
@@ -170,7 +170,7 @@ class VK extends VKontakte
         $response = [];
         for ($i = 0; $executeCount > $i; $i += $this->limitExecute) {
             $response = ArrayHelper::merge($response, $this->post('execute', ['code' => "return \n [" . implode(",\n", array_slice($this->execute, $i, $this->limitExecute)) . "];"]));
-            sleep($this->delayExecute);
+            sleep($this->delayExecute2);
         }
         $this->execute = [];
         return $response;
