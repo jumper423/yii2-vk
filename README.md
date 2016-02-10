@@ -147,7 +147,7 @@ $token = [
 $this->vk->vk_id = $data['user_id'];
 $this->vk->token = $token;
 $this->vk->save();
-$this->api->setToken($this->vkTable->token);
+$this->api->setToken($this->vk->token);
 ```
 
 ```php
