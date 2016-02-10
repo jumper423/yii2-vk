@@ -1,8 +1,8 @@
 {
   "name": "jumper423/yii2-vk",
-  "description": "",
+  "description": "Расширенная работа с API VK",
   "keywords": ["yii2", "vk", "api", "вконтакте", "апи", "vkontakte"],
-  "homepage": "",
+  "homepage": "http://infoblog1.ru/learn/cms/yii/rabota-s-api-vk-v-yii2",
   "type": "project",
   "license": "Apache License 2.0",
   "support": {

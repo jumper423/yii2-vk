@@ -2,231 +2,126 @@
 
 namespace jumper423;
 
-use Yii;
-use yii\authclient\clients\VKontakte;
+use yii\authclient\OAuthToken;
 use yii\base\Exception;
-use yii\helpers\ArrayHelper;
 use yii\helpers\Json;
 
-class VK extends VKontakte
+class VK extends VKBase
 {
-    public $delay = 0.7;
-    public $delayExecute2 = 120;
-    public $limitExecute = 1;
     /**
-     * @var null|string|Captcha
+     * @var integer
      */
-    public $captcha = 'captcha';
+    public $clientId;
 
-    private $lastRequest = null;
-    private $sleepRandMin = 0;
-    private $sleepRandMax = 500;
-    private $execute = [];
-
-    const MILLISECOND = 1000;
+    public $clientSecret;
 
     /**
-     * @inheritdoc
+     * @var string
      */
-    public function __construct($config = [])
+    public $redirectUri = 'https://oauth.vk.com/blank.html';
+
+    /**
+     * @var string
+     */
+    public $scope;
+
+    /**
+     * @var string
+     */
+    private $token;
+
+    private $big = false;
+
+    /**
+     * @return string
+     */
+    public function getOauthUri()
     {
-        parent::__construct($config);
-        if (is_string($this->captcha)) {
-            if (Yii::$app->has($this->captcha) && Yii::$app->get($this->captcha) instanceof CaptchaInterface) {
-                $this->captcha = Yii::$app->get($this->captcha);
-            } else {
-                $this->captcha = null;
-            }
-        } elseif (is_object($this->captcha)) {
-            if (!($this->captcha instanceof CaptchaInterface)) {
-                $this->captcha = null;
-            }
-        } else {
-            $this->captcha = null;
+        return "https://oauth.vk.com/authorize?client_id={$this->clientId}&display=popup&redirect_uri={$this->redirectUri}&scope={$this->scope}&response_type=token";
+    }
+
+    public function setToken($token)
+    {
+        $this->token = $token;
+    }
+
+    public function isToken()
+    {
+        if (!$this->token) {
+            return false;
+        }
+        try {
+            $this->api('messages.getDialogs', ['count' => 0]);
+            return true;
+        } catch (Exception $e){
+            return false;
         }
     }
 
     /**
-     * @param bool|false $delay
-     */
-    private function sleep($delay = false)
-    {
-        if ($delay === false) {
-            $delay = $this->delay;
-        }
-        if ($this->lastRequest === null) {
-            $this->lastRequest = microtime(true);
-        } else {
-            $microtime = microtime(true);
-            if ($this->lastRequest + $delay > $microtime) {
-                sleep($this->lastRequest + $delay - $microtime);
-                $this->lastRequest = microtime(true);
-            }
-        }
-        sleep(rand($this->sleepRandMin, $this->sleepRandMax) / self::MILLISECOND);
-    }
-
-    /**
-     * @inheritdoc
-     */
-    public function api($apiSubUrl, $method = 'GET', array $params = [], array $headers = [], $delay = false)
-    {
-        $this->sleep($delay);
-        $response = parent::api($apiSubUrl, $method, $params, $headers);
-        if (ArrayHelper::getValue($response, 'error.error_code') == 14 && $this->captcha) {
-            if ($this->captcha->run(ArrayHelper::getValue($response, 'error.captcha_img'))) {
-                $response = $this->api($apiSubUrl, $method, ArrayHelper::merge($params,
-                    [
-                        'captcha_sid' => ArrayHelper::getValue($response, 'error.captcha_sid'),
-                        'captcha_key' => $this->captcha->result()
-                    ])
-                    , $headers);
-            } else {
-                throw new Exception($this->captcha->error());
-            }
-        } elseif (ArrayHelper::getValue($response, 'error')) {
-            throw new Exception(ArrayHelper::getValue($response, 'error.error_msg'), ArrayHelper::getValue($response, 'error.error_code'));
-        }
-        return $response;
-    }
-
-    /**
-     * @param $apiSubUrl
+     * @param string $apiSubUrl
      * @param array $params
      * @param array $headers
-     * @param bool|false $delay
+     * @param bool $delay
+     * @param bool $error
      * @return array
-     * @throws Exception
+     * @throws \Exception
      */
-    public function post($apiSubUrl, array $params = [], array $headers = [], $delay = false)
+    public function api($apiSubUrl, array $params = [], array $headers = [], $delay = false, $error = false)
     {
-        return $this->api($apiSubUrl, 'POST', $params, $headers, $delay);
-    }
-
-    /**
-     * @param $apiSubUrl
-     * @param array $params
-     * @param array $headers
-     * @param bool|false $delay
-     * @return array
-     * @throws Exception
-     */
-    public function get($apiSubUrl, array $params = [], array $headers = [], $delay = false)
-    {
-        return $this->api($apiSubUrl, 'GET', $params, $headers, $delay);
-    }
-
-    /**
-     * @param $apiSubUrl
-     * @param array $params
-     */
-    public function addAction($apiSubUrl, array $params = [])
-    {
-        $this->execute[] = "API.{$apiSubUrl}(" . Json::encode($params) . ")";
-    }
-
-    /**
-     * @param $method
-     */
-    public function addActionsInCron($method)
-    {
-        $json = Json::decode(file_get_contents(Yii::getAlias("@actions/{$method}.json")));
-        $json = ArrayHelper::merge($json, $this->execute);
-        file_put_contents(Yii::getAlias("@actions/{$method}.json"), Json::encode($json));
-    }
-
-    /**
-     * @param $method
-     * @return array
-     */
-    public function performAnActionFromCron($method)
-    {
-        $response = [];
-        do {
-            $execute = Json::decode(file_get_contents(Yii::getAlias("@actions/{$method}.json")));
-            if (count($execute)) {
-                $executeRow = array_shift($execute);
-                $response = ArrayHelper::merge($response, $this->post('execute', ['code' => "return \n [" . $executeRow . "];"]));
-                $execute = Json::decode(file_get_contents(Yii::getAlias("@actions/{$method}.json")));
-                $r = array_search($executeRow, $execute);
-                if ($r !== false) {
-                    unset($execute[$r]);
-                    file_put_contents(Yii::getAlias("@actions/{$method}.json"), Json::encode($execute));
+        $params['lang'] = 'ru';
+        $countError = 0;
+        $e = new \Exception();
+        while ($countError < 5) {
+            try {
+                return parent::api($apiSubUrl, 'POST', $params, $headers, $delay)['response'];
+            } catch (\Exception $e) {
+                if ($error) {
+                    throw $e;
                 }
-                sleep($this->delayExecute2);
-            } else {
-                break;
+                if ($e->getCode()) {
+                    if ($e->getCode() == 6) {
+                        sleep(2);
+                        return $this->api($apiSubUrl, $params, $headers, $delay, true);
+                    } else {
+                        throw $e;
+                    }
+                } elseif ($countError > 0) {
+                    $this->big = true;
+                }
+                ++$countError;
             }
-        } while (true);
-        return $response;
+        }
+        throw $e;
     }
 
     /**
-     * @return array
+     * Returns default cURL options.
+     * @return array cURL options.
      */
-    public function performAnAction()
+    protected function defaultCurlOptions()
     {
-        $executeCount = count($this->execute);
-        $response = [];
-        for ($i = 0; $executeCount > $i; $i += $this->limitExecute) {
-            $response = ArrayHelper::merge($response, $this->post('execute', ['code' => "return \n [" . implode(",\n", array_slice($this->execute, $i, $this->limitExecute)) . "];"]));
-            sleep($this->delayExecute2);
-        }
-        $this->execute = [];
-        return $response;
-    }
-
-    /**
-     * @param $imagePath
-     * @param $albumId
-     * @param null|int $groupId
-     * @return int
-     * @throws Exception
-     */
-    public function loadImage($imagePath, $albumId, $groupId = null)
-    {
-        $params = ['album_id' => $albumId];
-        if ($groupId) {
-            $params['group_id'] = $groupId;
-        }
-        $request = $this->post('photos.getUploadServer', $params);
-        $uploadUrl = ArrayHelper::getValue($request, 'response.upload_url');
-        if ($uploadUrl) {
-            $ch = curl_init($uploadUrl);
-            curl_setopt($ch, CURLOPT_POST, 1);
-            curl_setopt($ch, CURLOPT_SAFE_UPLOAD, false);
-            curl_setopt($ch, CURLOPT_RETURNTRANSFER, true);
-            curl_setopt($ch, CURLOPT_POSTFIELDS, [
-                'file1' => "@" . $imagePath
-            ]);
-            $paramsSave = Json::decode(curl_exec($ch));
-            curl_close($ch);
-            if (count($paramsSave)) {
-                return ArrayHelper::getValue($this->post('photos.save', $paramsSave), 'response.0.pid');
-            } else {
-                throw new Exception('Empty params save');
-            }
+        $result = parent::defaultCurlOptions();
+        $result[CURLOPT_NOSIGNAL] = 1;
+        if ($this->big) {
+            $result[CURLOPT_CONNECTTIMEOUT_MS] = 60000;
+            $result[CURLOPT_TIMEOUT_MS] = 60000;
+            $this->big = false;
         } else {
-            throw new Exception('Not upload_url');
+            $result[CURLOPT_CONNECTTIMEOUT_MS] = 500;
+            $result[CURLOPT_TIMEOUT_MS] = 500;
         }
+        return $result;
     }
 
-    /**
-     * @inheritdoc
-     */
-    protected function initUserAttributes()
+    public function setAccessToken($token)
     {
-        $response = $this->api('users.get.json', 'GET', [
-            'fields' => implode(',', $this->attributeNames),
-        ]);
-        $attributes = array_shift($response['response']);
-
-        $accessToken = $this->getAccessToken();
-        if (is_object($accessToken)) {
-            $accessTokenParams = $accessToken->getParams();
-            $attributes = array_merge($accessTokenParams, $attributes);
+        if (is_string($token)) {
+            $token = Json::decode($token);
         }
-
-        return $attributes;
+        if (is_array($token)) {
+            $token = new OAuthToken($token);
+        }
+        parent::setAccessToken($token);
     }
 }
