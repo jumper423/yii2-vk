@@ -130,3 +130,45 @@ $vk->performAnActionFromCron('photos.edit');
 $imageId = $vk->loadImage($imagePath, $albumId, $groupId);
 ```
 
+Авторизация со всеми провами с помощью selenium
+------------
+
+```php
+$webDriver->getData($this->api->getOauthUri());
+```
+
+```php
+/**
+ * @param $url string
+ * @param $recursia bool
+ */
+public function getData($url, $recursia = true)
+{
+    $this->driver->get($url);
+    $this->driver->findElement(WebDriverBy::name('email'))->sendKeys($this->vkTable->login);
+    $this->driver->findElement(WebDriverBy::name('pass'))->sendKeys($this->vkTable->password);
+    $this->driver->findElement(WebDriverBy::id('install_allow'))->click();
+    sleep(3);
+    while ($this->driver->findElements(WebDriverBy::xpath('//input[@name=\'captcha_key\']'))) {
+        $this->captcha();
+        $this->driver->findElement(WebDriverBy::name('pass'))->sendKeys($this->vkTable->password);
+        $this->driver->findElement(WebDriverBy::id('install_allow'))->click();
+        sleep(3);
+    }
+    $this->driver->wait(60, 1000)->until(
+        WebDriverExpectedCondition::titleContains('VK | Request Access')
+    );
+    $this->driver->findElement(WebDriverBy::id('install_allow'))->click();
+    $this->driver->wait(60, 1000)->until(
+        WebDriverExpectedCondition::titleContains('OAuth Blank')
+    );
+    $urlCurrent = $this->driver->getCurrentURL();
+    $parseUrl = parse_url($urlCurrent);
+    if (!isset($parseUrl['fragment']) && $recursia == true) {
+        return $this->getData($url, false);
+    }
+    $query = $parseUrl['fragment'];
+    parse_str($query, $data);
+    return $data;
+}
+```
