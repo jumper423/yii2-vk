@@ -134,7 +134,20 @@ $imageId = $vk->loadImage($imagePath, $albumId, $groupId);
 ------------
 
 ```php
-$webDriver->getData($this->api->getOauthUri());
+$data = $webDriver->getData($this->api->getOauthUri());
+if (!count($data)) {
+    throw new Exception('Ошибка при авторизации');
+}
+$token = [
+    'tokenParamKey' => 'access_token',
+    'tokenSecretParamKey' => 'oauth_token_secret',
+    'createTimestamp' => time(),
+    'params' => $data,
+];
+$this->vk->vk_id = $data['user_id'];
+$this->vk->token = $token;
+$this->vk->save();
+$this->api->setToken($this->vkTable->token);
 ```
 
 ```php
