@@ -32,6 +32,24 @@ class VK extends VKBase
 
     private $big = false;
 
+    public function setClientId($clientId)
+    {
+        if (is_callable($clientId)){
+            $this->clientId = $clientId();
+        } else {
+            $this->clientId = $clientId;
+        }
+    }
+
+    public function setClientSecret($clientSecret)
+    {
+        if (is_callable($clientSecret)){
+            $this->clientSecret = $clientSecret();
+        } else {
+            $this->clientSecret = $clientSecret;
+        }
+    }
+
     /**
      * @return string
      */
