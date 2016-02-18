@@ -69,7 +69,7 @@ class VKBase extends VKontakte
     /**
      * @inheritdoc
      */
-    public function api($apiSubUrl, $method = 'GET', array $params = [], array $headers = [], $delay = false)
+    public function api($apiSubUrl, $method = 'GET', $params = [], $headers = [], $delay = false)
     {
         $this->sleep($delay);
         $response = parent::api($apiSubUrl, $method, $params, $headers);
