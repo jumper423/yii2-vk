@@ -9,13 +9,6 @@ use yii\helpers\Json;
 class VK extends VKBase
 {
     /**
-     * @var integer
-     */
-    public $clientId;
-
-    public $clientSecret;
-
-    /**
      * @var string
      */
     public $redirectUri = 'https://oauth.vk.com/blank.html';
@@ -32,21 +25,14 @@ class VK extends VKBase
 
     private $big = false;
 
-    public function setClientId($clientId)
+    public function init()
     {
-        if (is_callable($clientId)){
-            $this->clientId = $clientId();
-        } else {
-            $this->clientId = $clientId;
+        parent::init();
+        if (is_callable($this->clientId)){
+            $this->clientId = $this->clientId();
         }
-    }
-
-    public function setClientSecret($clientSecret)
-    {
-        if (is_callable($clientSecret)){
-            $this->clientSecret = $clientSecret();
-        } else {
-            $this->clientSecret = $clientSecret;
+        if (is_callable($this->clientSecret)){
+            $this->clientSecret = $this->clientSecret();
         }
     }
 
