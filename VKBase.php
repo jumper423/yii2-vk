@@ -72,7 +72,16 @@ class VKBase extends VKontakte
     public function api($apiSubUrl, $method = 'GET', $params = [], $headers = [], $delay = false)
     {
         $this->sleep($delay);
-        $response = parent::api($apiSubUrl, $method, $params, $headers);
+        if (preg_match('/^https?:\\/\\//is', $apiSubUrl)) {
+            $url = $apiSubUrl;
+        } else {
+            $url = $this->apiBaseUrl . '/' . $apiSubUrl;
+        }
+        $accessToken = $this->getAccessToken();
+        /*if (!is_object($accessToken) || !$accessToken->getIsValid()) {
+            throw new Exception('Invalid access token.');
+        }*/
+        $response = $this->apiInternal($accessToken, $url, $method, $params, $headers);
         if (ArrayHelper::getValue($response, 'error.error_code') == 14 && $this->captcha) {
             if ($this->captcha->run(ArrayHelper::getValue($response, 'error.captcha_img'))) {
                 $response = self::api($apiSubUrl, $method, ArrayHelper::merge($params,

@@ -29,10 +29,12 @@ class VK extends VKBase
     {
         parent::init();
         if (is_callable($this->clientId)){
-            $this->clientId = $this->clientId();
+            $f = $this->clientId;
+            $this->clientId = $f();
         }
         if (is_callable($this->clientSecret)){
-            $this->clientSecret = $this->clientSecret();
+            $f = $this->clientSecret;
+            $this->clientSecret = $f();
         }
     }
 
