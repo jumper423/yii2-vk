@@ -100,6 +100,18 @@ class VKBase extends VKontakte
     }
 
     /**
+     * @inheritdoc
+     */
+    protected function apiInternal($accessToken, $url, $method, array $params, array $headers)
+    {
+        if (is_object($accessToken)) {
+            $params['uids'] = $accessToken->getParam('user_id');
+            $params['access_token'] = $accessToken->getToken();
+        }
+        return $this->sendRequest($method, $url, $params, $headers);
+    }
+
+    /**
      * @param $apiSubUrl
      * @param array $params
      */
