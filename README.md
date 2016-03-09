@@ -1,5 +1,9 @@
 Yii2 VK
 ================
+
+Времнно используйте только вторую версию
+================
+
 Компонент для расширенной работы с ВК API в YII2. Загрузка изображений, распознавание капчи, постановка очередей и многое другое.
 
 Сайт с подробным описанием [yii2 api vk](http://infoblog1.ru/learn/cms/yii/rabota-s-api-vk-v-yii2)
@@ -21,13 +25,13 @@ Yii2 VK
 Либо запустить
 
 ```
-php composer.phar require --prefer-dist jumper423/yii2-vk "*"
+php composer.phar require --prefer-dist jumper423/yii2-vk "2.*"
 ```
 
 или добавить
 
 ```
-"jumper423/yii2-vk": "*"
+"jumper423/yii2-vk": "2.*"
 ```
 
 в файл `composer.json`.

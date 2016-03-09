@@ -71,7 +71,7 @@ class VK extends VKBase
      * @return array
      * @throws \Exception
      */
-    public function api($apiSubUrl, array $params = [], array $headers = [], $delay = false, $error = false)
+    public function api($apiSubUrl, $params = [], $headers = [], $delay = false, $error = false)
     {
         $params['lang'] = 'ru';
         $countError = 0;

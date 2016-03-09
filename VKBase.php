@@ -69,13 +69,13 @@ class VKBase extends VKontakte
     /**
      * @inheritdoc
      */
-    public function api($apiSubUrl, $method = 'GET', array $params = [], array $headers = [], $delay = false)
+    public function api($apiSubUrl, $method = 'GET', $params = [], $headers = [], $delay = false)
     {
         $this->sleep($delay);
         $response = parent::api($apiSubUrl, $method, $params, $headers);
         if (ArrayHelper::getValue($response, 'error.error_code') == 14 && $this->captcha) {
             if ($this->captcha->run(ArrayHelper::getValue($response, 'error.captcha_img'))) {
-                $response = $this->api($apiSubUrl, $method, ArrayHelper::merge($params,
+                $response = self::api($apiSubUrl, $method, ArrayHelper::merge($params,
                     [
                         'captcha_sid' => ArrayHelper::getValue($response, 'error.captcha_sid'),
                         'captcha_key' => $this->captcha->result()
