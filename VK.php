@@ -8,19 +8,19 @@ use yii\helpers\Json;
 
 class VK extends VKBase
 {
-    /**
-     * @var string
-     */
+    const SPEED_FAST = 'fast';
+    const SPEED_LONG = 'long';
+
+    /** @var string */
     public $redirectUri = 'https://oauth.vk.com/blank.html';
 
-    /**
-     * @var string
-     */
+    /** @var string */
     public $scope;
 
-    /**
-     * @var string
-     */
+    /** @var string */
+    public $speed;
+
+    /** @var string */
     private $token;
 
     private $big = false;
@@ -36,6 +36,7 @@ class VK extends VKBase
             $f = $this->clientSecret;
             $this->clientSecret = $f();
         }
+        $this->speed = self::SPEED_LONG;
     }
 
     /**
@@ -101,6 +102,16 @@ class VK extends VKBase
         throw $e;
     }
 
+    /** Позволять выполнять долгие запросы */
+    public function long(){
+        $this->speed = self::SPEED_LONG;
+    }
+
+    /** Стараться по возможности выполнять быстрые запросы, если в вк происходят сбои */
+    public function fast(){
+        $this->speed = self::SPEED_FAST;
+    }
+
     /**
      * Returns default cURL options.
      * @return array cURL options.
@@ -109,7 +120,7 @@ class VK extends VKBase
     {
         $result = parent::defaultCurlOptions();
         $result[CURLOPT_NOSIGNAL] = 1;
-        if ($this->big) {
+        if ($this->speed == self::SPEED_LONG || $this->big) {
             $result[CURLOPT_CONNECTTIMEOUT_MS] = 60000;
             $result[CURLOPT_TIMEOUT_MS] = 60000;
             $this->big = false;
