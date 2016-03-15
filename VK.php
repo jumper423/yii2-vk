@@ -4,12 +4,16 @@ namespace jumper423;
 
 use yii\authclient\OAuthToken;
 use yii\base\Exception;
+use yii\behaviors\AttributeBehavior;
 use yii\helpers\Json;
+use jumper423\behaviors\СallableBehavior;
 
 class VK extends VKBase
 {
     const SPEED_FAST = 'fast';
     const SPEED_LONG = 'long';
+
+    const EVENT_INIT = 'init';
 
     /** @var string */
     public $redirectUri = 'https://oauth.vk.com/blank.html';
@@ -18,7 +22,7 @@ class VK extends VKBase
     public $scope;
 
     /** @var string */
-    public $speed;
+    public $speed = self::SPEED_LONG;
 
     /** @var string */
     private $token;
@@ -28,15 +32,19 @@ class VK extends VKBase
     public function init()
     {
         parent::init();
-        if (is_callable($this->clientId)){
-            $f = $this->clientId;
-            $this->clientId = $f();
-        }
-        if (is_callable($this->clientSecret)){
-            $f = $this->clientSecret;
-            $this->clientSecret = $f();
-        }
-        $this->speed = self::SPEED_LONG;
+        $this->trigger(self::EVENT_INIT);
+    }
+
+    public function behaviors()
+    {
+        return [
+            [
+                'class' => СallableBehavior::className(),
+                'attributes' => [
+                    self::EVENT_INIT => ['clientId','clientSecret'],
+                ],
+            ],
+        ];
     }
 
     /**
