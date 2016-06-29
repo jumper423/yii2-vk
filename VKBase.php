@@ -189,7 +189,9 @@ class VKBase extends VKontakte
         if ($uploadUrl) {
             $ch = curl_init($uploadUrl);
             curl_setopt($ch, CURLOPT_POST, 1);
-            curl_setopt($ch, CURLOPT_SAFE_UPLOAD, false);
+            if (version_compare(PHP_VERSION, '5.5.0') >= 0) {
+                curl_setopt($ch, CURLOPT_SAFE_UPLOAD, false);
+            }
             curl_setopt($ch, CURLOPT_RETURNTRANSFER, true);
             curl_setopt($ch, CURLOPT_POSTFIELDS, [
                 'file1' => "@" . $imagePath
