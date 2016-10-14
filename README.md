@@ -1,5 +1,6 @@
 Yii2 VK
 ================
+[![PHP version](https://badge.fury.io/ph/jumper423%2Fyii2-vk.svg)](https://badge.fury.io/ph/jumper423%2Fyii2-vk)
 
 Времнно используйте только вторую версию
 ================
