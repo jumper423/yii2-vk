@@ -56,7 +56,7 @@ php composer.phar require --prefer-dist jumper423/yii2-vk "2.*"
 ],
 ```
 
-"Расшиненая" конфигурация
+"Расширенная" конфигурация
 
 ```php
 'components' => [
@@ -135,7 +135,7 @@ $vk->performAnActionFromCron('photos.edit');
 $imageId = $vk->loadImage($imagePath, $albumId, $groupId);
 ```
 
-Авторизация со всеми провами с помощью selenium
+Авторизация со всеми правами с помощью selenium
 ------------
 
 ```php
