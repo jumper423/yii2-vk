@@ -63,7 +63,7 @@ class VKBase extends VKontakte
                 $this->lastRequest = microtime(true);
             }
         }
-        usleep(rand($this->sleepRandMin, $this->sleepRandMax) * self::MILLISECOND);
+        usleep(rand($this->sleepRandMin * self::MILLISECOND, $this->sleepRandMax * self::MILLISECOND));
     }
 
     /**
