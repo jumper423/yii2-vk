@@ -20,10 +20,10 @@ class VKBase extends VKontakte
 
     private $lastRequest = null;
     private $sleepRandMin = 0;
-    private $sleepRandMax = 500;
+    private $sleepRandMax = 0.5;
     private $execute = [];
 
-    const MILLISECOND = 1000;
+    const MILLISECOND = 1000000;
 
     /**
      * @inheritdoc
@@ -59,11 +59,11 @@ class VKBase extends VKontakte
         } else {
             $microtime = microtime(true);
             if ($this->lastRequest + $delay > $microtime) {
-                sleep($this->lastRequest + $delay - $microtime);
+                usleep(($this->lastRequest + $delay - $microtime) * self::MILLISECOND);
                 $this->lastRequest = microtime(true);
             }
         }
-        sleep(rand($this->sleepRandMin, $this->sleepRandMax) / self::MILLISECOND);
+        usleep(rand($this->sleepRandMin, $this->sleepRandMax) * self::MILLISECOND);
     }
 
     /**
